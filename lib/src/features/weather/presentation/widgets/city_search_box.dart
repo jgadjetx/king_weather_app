@@ -11,14 +11,16 @@ class CitySearchBox extends StatefulWidget {
 }
 
 class _CitySearchRowState extends State<CitySearchBox> {
-  static const _radius = 30.0;
 
+  static const _radius = 30.0;
   late final _searchController = TextEditingController();
+  late WeatherProvider weatherProvider;
 
   @override
   void initState() {
     super.initState();
-    _searchController.text = context.read<WeatherProvider>().city;
+    weatherProvider = Provider.of<WeatherProvider>(context, listen: false);
+    _searchController.text = weatherProvider.city;
   }
 
   @override
@@ -27,7 +29,6 @@ class _CitySearchRowState extends State<CitySearchBox> {
     super.dispose();
   }
 
-  // circular radius
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -37,9 +38,17 @@ class _CitySearchRowState extends State<CitySearchBox> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Expanded(
+            Expanded(
               child: TextField(
-                //TODO make component functional and add style
+                decoration: const InputDecoration(                            
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(   
+                    borderSide: BorderSide.none, 
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(_radius), bottomLeft: Radius.circular(_radius)),
+                  ),
+                ),
+                controller: _searchController,
               ),
             ),
             InkWell(
@@ -57,10 +66,12 @@ class _CitySearchRowState extends State<CitySearchBox> {
                   child: Text('search', style: Theme.of(context).textTheme.bodyLarge),
                 ),
               ),
-              onTap: () {
+              onTap: () async {
                 FocusScope.of(context).unfocus();
-                context.read<WeatherProvider>().city = _searchController.text;
-                //TODO search weather
+                weatherProvider.showResultsView = true;
+                weatherProvider.city = _searchController.text;
+                await weatherProvider.getAllWeatherData();
+
               },
             )
           ],
@@ -68,4 +79,5 @@ class _CitySearchRowState extends State<CitySearchBox> {
       ),
     );
   }
+
 }

@@ -1,26 +1,22 @@
-/// Uri builder class for the OpenWeatherMap API
 class OpenWeatherMapAPI {
+
   OpenWeatherMapAPI(this.apiKey);
 
   final String apiKey;
-
   static const String _apiBaseUrl = "api.openweathermap.org";
-  static const String _apiPath = "/data/2.5/";
+  static const String _apiPath = "/data/2.5/";  
 
-  Uri weather(String city) => _buildUri(
-        endpoint: "weather",
-        parametersBuilder: () => cityQueryParameters(city),
-      );
+  Uri weather(String city, bool isInCelsius) => _buildUri(
+    endpoint: "weather",
+    parametersBuilder: () => cityQueryParameters(city, isInCelsius),
+  );
 
-  Uri forecast(String city) => _buildUri(
-        endpoint: "forecast",
-        parametersBuilder: () => cityQueryParameters(city),
-      );
+  Uri forecast(String city, bool isInCelsius) => _buildUri(
+    endpoint: "forecast",
+    parametersBuilder: () => cityQueryParameters(city, isInCelsius),
+  );
 
-  Uri _buildUri({
-    required String endpoint,
-    required Map<String, dynamic> Function() parametersBuilder,
-  }) {
+  Uri _buildUri({required String endpoint,required Map<String, dynamic> Function() parametersBuilder}) {
     return Uri(
       scheme: "https",
       host: _apiBaseUrl,
@@ -29,11 +25,12 @@ class OpenWeatherMapAPI {
     );
   }
 
-  Map<String, dynamic> cityQueryParameters(String city) => {
-        "q": city,
-        "appid": apiKey,
-        "units": "metric",
-        "type": "like",
-        "cnt": "30",
-      };
+  Map<String, dynamic> cityQueryParameters(String city, bool isInCelsius) => {
+    "q": city,
+    "appid": apiKey,
+    "units": isInCelsius ? "metric" : "imperial",
+    "type": "like",
+    "cnt": "30",
+  };
+
 }
